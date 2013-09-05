@@ -1,18 +1,19 @@
-###############################################################################
+###########################################################################
 # Copyright (C) 2007-2010 Lawrence Livermore National Security, LLC.
 # Copyright (C) 2007 The Regents of the University of California.
 # Written by Brian Behlendorf <behlendorf1@llnl.gov>.
-###############################################################################
+###########################################################################
 # SPL_AC_CONFIG_KERNEL: Default SPL kernel configuration.
-###############################################################################
+###########################################################################
 
-AC_DEFUN([SPL_AC_CONFIG_KERNEL], [
+AC_DEFUN([SPL_AC_CONFIG_KERNEL],[
 	SPL_AC_KERNEL
 
-	AC_SUBST(KERNELMAKE_PARAMS)
+	AC_SUBST([KERNELMAKE_PARAMS])
 
+	AC_REQUIRE([AC_PROG_CPP])
 	KERNELCPPFLAGS="$KERNELCPPFLAGS -Wstrict-prototypes"
-	AC_SUBST(KERNELCPPFLAGS)
+	AC_SUBST([KERNELCPPFLAGS])
 
 	SPL_AC_DEBUG
 	SPL_AC_DEBUG_LOG
@@ -21,13 +22,13 @@ AC_DEFUN([SPL_AC_CONFIG_KERNEL], [
 	SPL_AC_TEST_MODULE
 ])
 
-AC_DEFUN([SPL_AC_KERNEL], [
+AC_DEFUN([SPL_AC_KERNEL],[
 	AC_ARG_WITH([kernel-modprefix],
-		AS_HELP_STRING([--with-kernel-modprefix=PATH],
-		[Path to kernel module prefix]),
+		[AS_HELP_STRING([--with-kernel-modprefix=PATH],
+		[Path to kernel module prefix])],
 		[KERNEL_MODPREFIX="$withval"])
 	AC_MSG_CHECKING([kernel module prefix])
-	AS_IF([test -z "$KERNEL_MODPREFIX"], [
+	AS_IF([test -z "$KERNEL_MODPREFIX"],[
 		KERNEL_MODPREFIX="/System/Library/Extensions"
 	])
 	AC_MSG_RESULT([$KERNEL_MODPREFIX])
@@ -38,13 +39,13 @@ AC_DEFUN([SPL_AC_KERNEL], [
 		[KERNEL_HEADERS="$withval"])
 
 	AC_MSG_CHECKING([kernel header directory])
-	AS_IF([test -z "$KERNEL_HEADERS"], [
-		AS_IF([test -d "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk/System/Library/Frameworks/Kernel.framework"], [
+	AS_IF([test -z "$KERNEL_HEADERS"],[
+		AS_IF([test -d "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk/System/Library/Frameworks/Kernel.framework"],[
 			KERNEL_HEADERS="/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk/System/Library/Frameworks/Kernel.framework"
 		])
 	])
 	AS_IF([test -z "$KERNEL_HEADERS"], [
-		AS_IF([test -d "/System/Library/Frameworks/Kernel.framework/Headers"], [
+		AS_IF([test -d "/System/Library/Frameworks/Kernel.framework/Headers"],[
 			KERNEL_HEADERS="/System/Library/Frameworks/Kernel.framework"
 		])
 	])
@@ -58,24 +59,26 @@ AC_DEFUN([SPL_AC_KERNEL], [
 	KERNEL_VERSION=`uname -r`
 	AC_MSG_RESULT([$KERNEL_VERSION])
 
-	AC_SUBST(KERNEL_HEADERS)
-	AC_SUBST(KERNEL_MODPREFIX)
-	AC_SUBST(KERNEL_VERSION)
+	AC_SUBST([KERNEL_HEADERS])
+	AC_SUBST([KERNEL_MODPREFIX])
+	AC_SUBST([KERNEL_VERSION])
 ])
 
 dnl #
 dnl # Default SPL user configuration
 dnl #
-AC_DEFUN([SPL_AC_CONFIG_USER], [])
+AC_DEFUN([SPL_AC_CONFIG_USER],[])
 
 dnl #
 dnl # Check for rpm+rpmbuild to build RPM packages.  If these tools
 dnl # are missing it is non-fatal but you will not be able to build
 dnl # RPM packages and will be warned if you try too.
 dnl #
-AC_DEFUN([SPL_AC_RPM], [
+AC_DEFUN([SPL_AC_RPM],[
 	RPM=rpm
 	RPMBUILD=rpmbuild
+	
+	AC_REQUIRE([AC_PROG_AWK])
 
 	AC_MSG_CHECKING([whether $RPM is available])
 	AS_IF([tmp=$($RPM --version 2>/dev/null)], [
@@ -88,7 +91,7 @@ AC_DEFUN([SPL_AC_RPM], [
 	])
 
 	AC_MSG_CHECKING([whether $RPMBUILD is available])
-	AS_IF([tmp=$($RPMBUILD --version 2>/dev/null)], [
+	AS_IF([tmp=$($RPMBUILD --version 2>/dev/null)],[
 		RPMBUILD_VERSION=$(echo $tmp | $AWK '/RPM/ { print $[3] }')
 		HAVE_RPMBUILD=yes
 		AC_MSG_RESULT([$HAVE_RPMBUILD ($RPMBUILD_VERSION)])
@@ -97,13 +100,13 @@ AC_DEFUN([SPL_AC_RPM], [
 		AC_MSG_RESULT([$HAVE_RPMBUILD])
 	])
 
-	AC_SUBST(HAVE_RPM)
-	AC_SUBST(RPM)
-	AC_SUBST(RPM_VERSION)
+	AC_SUBST([HAVE_RPM])
+	AC_SUBST([RPM])
+	AC_SUBST([RPM_VERSION])
 
-	AC_SUBST(HAVE_RPMBUILD)
-	AC_SUBST(RPMBUILD)
-	AC_SUBST(RPMBUILD_VERSION)
+	AC_SUBST([HAVE_RPMBUILD])
+	AC_SUBST([RPMBUILD])
+	AC_SUBST([RPMBUILD_VERSION])
 ])
 
 dnl #
@@ -111,9 +114,11 @@ dnl # Check for dpkg+dpkg-buildpackage to build DEB packages.  If these
 dnl # tools are missing it is non-fatal but you will not be able to build
 dnl # DEB packages and will be warned if you try too.
 dnl #
-AC_DEFUN([SPL_AC_DPKG], [
+AC_DEFUN([SPL_AC_DPKG],[
 	DPKG=dpkg
 	DPKGBUILD=dpkg-buildpackage
+
+	AC_REQUIRE([AC_PROG_AWK])
 
 	AC_MSG_CHECKING([whether $DPKG is available])
 	AS_IF([tmp=$($DPKG --version 2>/dev/null)], [
@@ -136,13 +141,13 @@ AC_DEFUN([SPL_AC_DPKG], [
 		AC_MSG_RESULT([$HAVE_DPKGBUILD])
 	])
 
-	AC_SUBST(HAVE_DPKG)
-	AC_SUBST(DPKG)
-	AC_SUBST(DPKG_VERSION)
+	AC_SUBST([HAVE_DPKG])
+	AC_SUBST([DPKG])
+	AC_SUBST([DPKG_VERSION])
 
-	AC_SUBST(HAVE_DPKGBUILD)
-	AC_SUBST(DPKGBUILD)
-	AC_SUBST(DPKGBUILD_VERSION)
+	AC_SUBST([HAVE_DPKGBUILD])
+	AC_SUBST([DPKGBUILD])
+	AC_SUBST([DPKGBUILD_VERSION])
 ])
 
 dnl #
@@ -150,13 +155,16 @@ dnl # Check for pacman+makepkg to build Arch Linux packages.  If these
 dnl # tools are missing it is non-fatal but you will not be able to
 dnl # build Arch Linux packages and will be warned if you try too.
 dnl #
-AC_DEFUN([SPL_AC_PACMAN], [
+AC_DEFUN([SPL_AC_PACMAN],[
 	PACMAN=pacman
 	MAKEPKG=makepkg
 
+	AC_REQUIRE([AC_PROG_AWK])
+	AC_REQUIRE([AC_PROG_SED])
+
 	AC_MSG_CHECKING([whether $PACMAN is available])
 	tmp=$($PACMAN --version 2>/dev/null)
-	AS_IF([test -n "$tmp"], [
+	AS_IF([test -n "$tmp"],[
 		PACMAN_VERSION=$(echo $tmp |
 		                 $AWK '/Pacman/ { print $[3] }' |
 		                 $SED 's/^v//')
@@ -178,13 +186,13 @@ AC_DEFUN([SPL_AC_PACMAN], [
 		AC_MSG_RESULT([$HAVE_MAKEPKG])
 	])
 
-	AC_SUBST(HAVE_PACMAN)
-	AC_SUBST(PACMAN)
-	AC_SUBST(PACMAN_VERSION)
+	AC_SUBST([HAVE_PACMAN])
+	AC_SUBST([PACMAN])
+	AC_SUBST([PACMAN_VERSION])
 
-	AC_SUBST(HAVE_MAKEPKG)
-	AC_SUBST(MAKEPKG)
-	AC_SUBST(MAKEPKG_VERSION)
+	AC_SUBST([HAVE_MAKEPKG])
+	AC_SUBST([MAKEPKG])
+	AC_SUBST([MAKEPKG_VERSION])
 ])
 
 dnl #
@@ -193,8 +201,10 @@ dnl # can be added the least we can do is attempt to use alien to
 dnl # convert the RPM packages to the needed package type.  This is
 dnl # a hack but so far it has worked reasonable well.
 dnl #
-AC_DEFUN([SPL_AC_ALIEN], [
+AC_DEFUN([SPL_AC_ALIEN],[
 	ALIEN=alien
+
+	AC_REQUIRE([AC_PROG_AWK])
 
 	AC_MSG_CHECKING([whether $ALIEN is available])
 	AS_IF([tmp=$($ALIEN --version 2>/dev/null)], [
@@ -206,16 +216,16 @@ AC_DEFUN([SPL_AC_ALIEN], [
 		AC_MSG_RESULT([$HAVE_ALIEN])
 	])
 
-	AC_SUBST(HAVE_ALIEN)
-	AC_SUBST(ALIEN)
-	AC_SUBST(ALIEN_VERSION)
+	AC_SUBST([HAVE_ALIEN])
+	AC_SUBST([ALIEN])
+	AC_SUBST([ALIEN_VERSION])
 ])
 
 dnl #
 dnl # Using the VENDOR tag from config.guess set the default
 dnl # package type for 'make pkg': (rpm | deb | tgz)
 dnl #
-AC_DEFUN([SPL_AC_DEFAULT_PACKAGE], [
+AC_DEFUN([SPL_AC_DEFAULT_PACKAGE],[
 	AC_MSG_CHECKING([linux distribution])
 	if test -f /etc/toss-release ; then
 		VENDOR=toss ;
@@ -241,7 +251,7 @@ AC_DEFUN([SPL_AC_DEFAULT_PACKAGE], [
 		VENDOR= ;
 	fi
 	AC_MSG_RESULT([$VENDOR])
-	AC_SUBST(VENDOR)
+	AC_SUBST([VENDOR])
 
 	AC_MSG_CHECKING([default package type])
 	case "$VENDOR" in
@@ -259,27 +269,27 @@ AC_DEFUN([SPL_AC_DEFAULT_PACKAGE], [
 	esac
 
 	AC_MSG_RESULT([$DEFAULT_PACKAGE])
-	AC_SUBST(DEFAULT_PACKAGE)
+	AC_SUBST([DEFAULT_PACKAGE])
 ])
 
 dnl #
 dnl # Default SPL user configuration
 dnl #
-AC_DEFUN([SPL_AC_PACKAGE], [
+AC_DEFUN([SPL_AC_PACKAGE],[
 	SPL_AC_DEFAULT_PACKAGE
 	SPL_AC_RPM
 	SPL_AC_DPKG
 	SPL_AC_ALIEN
 
-	AS_IF([test "$VENDOR" = "arch"], [SPL_AC_PACMAN])
+	AS_IF([test "$VENDOR" = "arch"],[SPL_AC_PACMAN])
 ])
 
-AC_DEFUN([SPL_AC_LICENSE], [
+AC_DEFUN([SPL_AC_LICENSE],[
 	AC_MSG_CHECKING([spl license])
 	LICENSE=GPL
 	AC_MSG_RESULT([$LICENSE])
 	KERNELCPPFLAGS="${KERNELCPPFLAGS} -DHAVE_GPL_ONLY_SYMBOLS"
-	AC_SUBST(LICENSE)
+	AC_SUBST([LICENSE])
 ])
 
 AC_DEFUN([SPL_AC_CONFIG], [
@@ -289,14 +299,14 @@ AC_DEFUN([SPL_AC_CONFIG], [
 		[Config file 'kernel|user|all|srpm']),
 		[SPL_CONFIG="$withval"])
 	AC_ARG_ENABLE([linux-builtin],
-		[AC_HELP_STRING([--enable-linux-builtin],
+		[AS_HELP_STRING([--enable-linux-builtin],
 		[Configure for builtin in-tree kernel modules @<:@default=no@:>@])],
 		[],
 		[enable_linux_builtin=no])
 
 	AC_MSG_CHECKING([spl config])
 	AC_MSG_RESULT([$SPL_CONFIG]);
-	AC_SUBST(SPL_CONFIG)
+	AC_SUBST([SPL_CONFIG])
 
 	case "$SPL_CONFIG" in
 		kernel) SPL_AC_CONFIG_KERNEL ;;
@@ -321,7 +331,7 @@ dnl #
 dnl # Enable if the SPL should be compiled with internal debugging enabled.
 dnl # By default this support is disabled.
 dnl #
-AC_DEFUN([SPL_AC_DEBUG], [
+AC_DEFUN([SPL_AC_DEBUG],[
 	AC_MSG_CHECKING([whether strict compile is enabled])
 	AC_ARG_ENABLE([strict-compile],
 		[AS_HELP_STRING([--enable-strict-compile],
@@ -346,13 +356,13 @@ AC_DEFUN([SPL_AC_DEBUG], [
 		KERNELCPPFLAGS="${KERNELCPPFLAGS} -DDEBUG"
 		DEBUG_CFLAGS="-DDEBUG"
 		DEBUG_SPL="_with_debug"
-	], [
+	],[
 		DEBUG_CFLAGS=""
 		DEBUG_SPL="_without_debug"
 	])
 
-	AC_SUBST(DEBUG_CFLAGS)
-	AC_SUBST(DEBUG_SPL)
+	AC_SUBST([DEBUG_CFLAGS])
+	AC_SUBST([DEBUG_SPL])
 	AC_MSG_RESULT([$enable_debug])
 ])
 
@@ -367,7 +377,7 @@ dnl #
 dnl # echo 1 >/proc/sys/kernel/spl/debug/dump
 dnl # spl /tmp/spl-log.xxx.yyy /tmp/spl-log.xxx.yyy.txt
 dnl #
-AC_DEFUN([SPL_AC_DEBUG_LOG], [
+AC_DEFUN([SPL_AC_DEBUG_LOG],[
 	AC_ARG_ENABLE([debug-log],
 		[AS_HELP_STRING([--enable-debug-log],
 		[Enable basic debug logging @<:@default=yes@:>@])],
@@ -380,11 +390,11 @@ AC_DEFUN([SPL_AC_DEBUG_LOG], [
 		DEBUG_LOG="_with_debug_log"
 		AC_DEFINE([DEBUG_LOG], [1],
 		[Define to 1 to enable basic debug logging])
-	], [
+	],[
 		DEBUG_LOG="_without_debug_log"
 	])
 
-	AC_SUBST(DEBUG_LOG)
+	AC_SUBST([DEBUG_LOG])
 	AC_MSG_CHECKING([whether basic debug logging is enabled])
 	AC_MSG_RESULT([$enable_debug_log])
 ])
@@ -396,7 +406,7 @@ dnl # Then at module unload time a report to the console will be printed
 dnl # if memory was leaked.  Additionally, /proc/spl/kmem/slab will exist
 dnl # and provide an easy way to inspect the kmem based slab.
 dnl #
-AC_DEFUN([SPL_AC_DEBUG_KMEM], [
+AC_DEFUN([SPL_AC_DEBUG_KMEM],[
 	AC_ARG_ENABLE([debug-kmem],
 		[AS_HELP_STRING([--enable-debug-kmem],
 		[Enable basic kmem accounting @<:@default=yes@:>@])],
@@ -407,32 +417,34 @@ AC_DEFUN([SPL_AC_DEBUG_KMEM], [
 	[
 		KERNELCPPFLAGS="${KERNELCPPFLAGS} -DDEBUG_KMEM"
 		DEBUG_KMEM="_with_debug_kmem"
-		AC_DEFINE([DEBUG_KMEM], [1],
+		AC_DEFINE([DEBUG_KMEM],[1],
 		[Define to 1 to enable basic kmem accounting])
-	], [
+	],[
 		DEBUG_KMEM="_without_debug_kmem"
 	])
 
-	AC_SUBST(DEBUG_KMEM)
+	AC_SUBST([DEBUG_KMEM])
 	AC_MSG_CHECKING([whether basic kmem accounting is enabled])
 	AC_MSG_RESULT([$enable_debug_kmem])
 ])
 
-dnl #
-dnl # Disabled by default it provides detailed memory tracking.  This
-dnl # feature also requires --enable-debug-kmem to be set.  When enabled
-dnl # not only will total bytes be tracked but also the location of every
-dnl # alloc and free.  When the SPL module is unloaded a list of all leaked
-dnl # addresses and where they were allocated will be dumped to the console.
-dnl # Enabling this feature has a significant impact on performance but it
-dnl # makes finding memory leaks pretty straight forward.
-dnl #
-AC_DEFUN([SPL_AC_DEBUG_KMEM_TRACKING], [
+dnl#
+dnl# Disabled by default it provides detailed memory tracking.  This
+dnl# feature also requires --enable-debug-kmem to be set.  When enabled
+dnl# not only will total bytes be tracked but also the location of every
+dnl# alloc and free.  When the SPL module is unloaded a list of all leaked
+dnl# addresses and where they were allocated will be dumped to the console.
+dnl# Enabling this feature has a significant impact on performance but it
+dnl# makes finding memory leaks pretty straight forward.
+dnl#
+AC_DEFUN([SPL_AC_DEBUG_KMEM_TRACKING],[
 	AC_ARG_ENABLE([debug-kmem-tracking],
 		[AS_HELP_STRING([--enable-debug-kmem-tracking],
 		[Enable detailed kmem tracking  @<:@default=no@:>@])],
 		[],
 		[enable_debug_kmem_tracking=no])
+
+	AC_REQUIRE([AC_PROG_CPP])
 
 	AS_IF([test "x$enable_debug_kmem_tracking" = xyes],
 	[
@@ -440,11 +452,11 @@ AC_DEFUN([SPL_AC_DEBUG_KMEM_TRACKING], [
 		DEBUG_KMEM_TRACKING="_with_debug_kmem_tracking"
 		AC_DEFINE([DEBUG_KMEM_TRACKING], [1],
 		[Define to 1 to enable detailed kmem tracking])
-	], [
+	],[
 		DEBUG_KMEM_TRACKING="_without_debug_kmem_tracking"
 	])
 
-	AC_SUBST(DEBUG_KMEM_TRACKING)
+	AC_SUBST([DEBUG_KMEM_TRACKING])
 	AC_MSG_CHECKING([whether detailed kmem tracking is enabled])
 	AC_MSG_RESULT([$enable_debug_kmem_tracking])
 ])
@@ -453,7 +465,7 @@ dnl #
 dnl # SPL_CHECK_SYMBOL_HEADER
 dnl # check if a symbol prototype is defined in listed headers.
 dnl #
-AC_DEFUN([SPL_CHECK_SYMBOL_HEADER], [
+AC_DEFUN([SPL_CHECK_SYMBOL_HEADER],[
 	AC_MSG_CHECKING([whether symbol $1 exists in header])
 	header=0
 	for file in $3; do
@@ -479,16 +491,16 @@ dnl # check whether header exists and define HAVE_$2_HEADER
 dnl #
 AC_DEFUN([SPL_CHECK_HEADER],
 	[AC_MSG_CHECKING([whether header $1 exists])
-	AC_TRY_COMPILE([
+	AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
 		#include <$1>
-	],[
+	]],[[
 		return 0;
-	],[
-		AC_DEFINE(HAVE_$2_HEADER, 1, [$1 exists])
-		AC_MSG_RESULT(yes)
+	]])],[
+		AC_DEFINE([HAVE_$2_HEADER],[1],[$1 exists])
+		AC_MSG_RESULT([yes])
 		$3
 	],[
-		AC_MSG_RESULT(no)
+		AC_MSG_RESULT([no])
 		$4
 	])
 ])
@@ -498,7 +510,7 @@ dnl # Basic toolchain sanity check.
 dnl #
 AC_DEFUN([SPL_AC_TEST_MODULE],
 	[AC_MSG_CHECKING([whether modules can be built])
-	AC_TRY_COMPILE([],[],[
+	AC_COMPILE_IFELSE([AC_LANG_SOURCE([[]],[[]])],[
 		AC_MSG_RESULT([yes])
 	],[
 		AC_MSG_RESULT([no])

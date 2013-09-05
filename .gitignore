@@ -13,6 +13,7 @@
 #
 # Normal rules
 #
+*(Autosaved)*
 *.[oa]
 *.ko
 *.ko.unsigned
@@ -20,6 +21,7 @@
 *.ko.out.sig
 *.lo
 *.la
+*.log
 *.mod.c
 *~
 *.swp
@@ -35,9 +37,11 @@ Makefile.in
 # Top level generated files specific to this top level dir
 #
 /configure
+/configure.scan
 /config.log
 /config.status
 /libtool
+/m4/*.m4
 /spl_config.h
 /spl_config.h.in
 /spl.spec
@@ -50,6 +54,7 @@ Makefile.in
 /aclocal.m4
 /autom4te.cache
 /config/compile
+/config/ar-lib
 
 #
 # Top level generic files

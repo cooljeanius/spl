@@ -59,12 +59,11 @@ KERNEL_MODDIR=	$(DESTDIR)@KERNEL_MODPREFIX@/spl.kext
 dist_noinst_DATA = $(PLIST_STRING) $(INFO_PLIST)
 
 spl.kext$(EXEEXT): spl $(PLIST_STRING) $(INFO_PLIST)
-	@echo ""
 	@mkdir -p spl.kext/Contents/Resources/English.lproj spl.kext/Contents/MacOS
 	@cp -f $(INFO_PLIST) spl.kext/Contents/
 	@cp -f $(PLIST_STRING) spl.kext/Contents/Resources/English.lproj/
 	@cp -f spl spl.kext/Contents/MacOS/
-	@kextlibs -undef-symbols -xml spl.kext/
+	kextlibs -undef-symbols -xml spl.kext/
 
 install-exec-local: spl.kext
 	rm -rf $(KERNEL_MODDIR)
@@ -76,9 +75,11 @@ install-exec-local: spl.kext
 	@echo "To uninstall module: rm -rf $(KERNEL_MODDIR)"
 	@echo
 
-uninstall-am:
+uninstall-local:
 	rm -rf /System/Library/Extensions/spl.kext
 
+# This intentionally overrides the automake target, because the
+# kext is a directory
 clean:
 	rm -rf spl.kext/
 	rm -f *.o *.lo spl

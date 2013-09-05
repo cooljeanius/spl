@@ -1,16 +1,17 @@
-###############################################################################
+###########################################################################
 # Copyright (C) 2010 Lawrence Livermore National Security, LLC.
 # Written by Brian Behlendorf <behlendorf1@llnl.gov>.
-###############################################################################
+###########################################################################
 # Build targets for TGZ packages.
 #
-# Long term native distro specific Slackware style packaging should be added.
-# In the short term RPM packages are built and converted to TGZ packages
-# using alien.  If someone familiar with Slackware style packaging were to
-# update the build system to correctly build Slackware style packages I would
-# happily take it.  Until then we will have to make due with alien.
+# Long term native distro specific Slackware style packaging should be
+# added. In the short term RPM packages are built and converted to TGZ
+# packages using alien.  If someone familiar with Slackware style packaging
+# were to update the build system to correctly build Slackware style
+# packages I would happily take it.  Until then we will have to make due
+# with alien.
 #
-###############################################################################
+###########################################################################
 
 tgz-local:
 	@(if test "${HAVE_ALIEN}" = "no"; then \

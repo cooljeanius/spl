@@ -11,6 +11,8 @@ KERNEL_DIR = module include
 endif
 SUBDIRS = $(USER_DIR) $(KERNEL_DIR)
 
+ACLOCAL_AMFLAGS = -I m4
+AM_LIBTOOLFLAGS = --automake
 AUTOMAKE_OPTIONS = foreign
 EXTRA_DIST  = autogen.sh spl.spec.in spl-modules.spec.in META DISCLAIMER
 EXTRA_DIST += config/config.awk config/rpm.am config/deb.am config/tgz.am
@@ -40,7 +42,7 @@ install-data-local:
 	done
 endif
 
-ctags:
+ctags-local:
 	$(RM) $(top_srcdir)/tags
 	find $(top_srcdir) -name .git -prune -o -name '*.[hc]' | xargs ctags
 
@@ -48,7 +50,7 @@ etags:
 	$(RM) $(top_srcdir)/TAGS
 	find $(top_srcdir) -name .pc -prune -o -name '*.[hc]' | xargs etags -a
 
-tags: ctags etags
+tags-local: ctags-local etags
 
 pkg: @DEFAULT_PACKAGE@
 pkg-modules: @DEFAULT_PACKAGE@-modules

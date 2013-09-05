@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CFBundleDisplayName</key>
+	<string>SPL</string>
 	<key>BuildMachineOSBuild</key>
 	<string>12C60</string>
 	<key>CFBundleDevelopmentRegion</key>
@@ -31,27 +33,27 @@
 	<key>DTSDKBuild</key>
 	<string>12C37</string>
 	<key>DTSDKName</key>
-	<string>macosx10.8</string>
+	<string>macosx10.6</string>
 	<key>DTXcode</key>
 	<string>0452</string>
 	<key>DTXcodeBuild</key>
 	<string>4G2008a</string>
-    <key>OSBundleCompatibleVersion</key>
-    <string>1.0.0</string>
+	<key>OSBundleCompatibleVersion</key>
+	<string>1.0.0</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>CDDL (ZFS), BSD (FreeBSD)</string>
 	<key>OSBundleLibraries</key>
 	<dict>
 		<key>com.apple.kpi.libkern</key>
-		<string>10.0</string>
-                <key>com.apple.kpi.bsd</key>
-                <string>8.0.0</string>
-                <key>com.apple.kpi.mach</key>
-                <string>8.0.0</string>
-                <key>com.apple.kpi.unsupported</key>
-                <string>8.0.0</string>
-                <key>com.apple.kpi.iokit</key>
-                <string>8.0.0</string>
+		<string>10.8.0</string>
+		<key>com.apple.kpi.bsd</key>
+		<string>10.8.0</string>
+		<key>com.apple.kpi.mach</key>
+		<string>10.8.0</string>
+		<key>com.apple.kpi.unsupported</key>
+		<string>10.8.0</string>
+		<key>com.apple.kpi.iokit</key>
+		<string>10.8.0</string>
 	</dict>
 </dict>
 </plist>
