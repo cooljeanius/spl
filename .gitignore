@@ -42,6 +42,10 @@ Makefile.in
 /config.status
 /libtool
 /m4/*.m4
+/confdefs.h
+/conftest*
+/conf*/*.awk
+/target.h
 /spl_config.h
 /spl_config.h.in
 /spl.spec
