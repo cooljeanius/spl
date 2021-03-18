@@ -1,0 +1,6 @@
+config/ax_*.m4 linguist-vendored
+config/Ebg*.m4 linguist-vendored
+config/libtool.m4 linguist-vendored
+config/lt*.m4 linguist-vendored
+config/pkg.m4 linguist-vendored
+config/xorg-macros.m4 linguist-vendored
