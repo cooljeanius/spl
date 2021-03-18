@@ -2,7 +2,7 @@
 This is spl.kext, the Solaris Portability Layer (SPL)
 
 It is tested primarily on Mac OS 10.8.2 and secondarily on 10.6.8, with
-the latest Macports.
+the latest Macports (as of the time of the writing of this README).
 
 See https://github.com/zfs-osx/ and http://MacZFS.org/ for more information.
 Note MacZFS's wiki on kernel development and panic decoding.
