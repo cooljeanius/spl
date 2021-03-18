@@ -11,7 +11,7 @@ KERNEL_DIR = module include
 endif
 SUBDIRS = $(USER_DIR) $(KERNEL_DIR)
 
-ACLOCAL_AMFLAGS = -I m4
+ACLOCAL_AMFLAGS = -Iconfig -Im4 --install
 AM_LIBTOOLFLAGS = --automake
 AUTOMAKE_OPTIONS = foreign
 EXTRA_DIST  = autogen.sh spl.spec.in spl-modules.spec.in META DISCLAIMER

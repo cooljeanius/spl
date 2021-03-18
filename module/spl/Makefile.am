@@ -70,10 +70,10 @@ install-exec-local: spl.kext
 	mkdir -p $(KERNEL_MODDIR)
 	rsync -r spl.kext/ $(KERNEL_MODDIR)
 	chown -R root:wheel $(KERNEL_MODDIR)
-	@echo
+	@echo ""
 	@echo "To load module: kextload -v $(KERNEL_MODDIR)"
 	@echo "To uninstall module: rm -rf $(KERNEL_MODDIR)"
-	@echo
+	@echo ""
 
 uninstall-local:
 	rm -rf /System/Library/Extensions/spl.kext
