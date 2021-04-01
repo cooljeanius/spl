@@ -47,7 +47,10 @@ AX_CHECK_DOS_FILESYS_LIMITATIONS dnl# from m4/ax_check_dos_filesys.m4 (from the 
 AC_GET_MACOSX_VERSION
 
 dnl# EBG_* macros are from m4/EbgMacOSXOptions.m4 (my personal macro file)
-EBG_MAC_UNIVERSAL
+m4_ifdef([EBG_MAC_UNIVERSAL],[
+  dnl# yes, this is my own macro that I seem to have lost... I am disorganized
+  EBG_MAC_UNIVERSAL
+])
 EBG_PROG_MACHINE
 EBG_DEVELOPER_DIR
 
@@ -232,6 +235,9 @@ AC_CHECK_ALIGNOF([void *])dnl
 AC_PROG_GCC_TRADITIONAL
 AX_GCC_ARCHFLAG dnl# from m4/ax_gcc_archflag.m4 (from the autoconf-archive)
 dnl# These are all from m4/ax_check_compile_flag.m4 (from the autoconf-archive)
+AX_CHECK_COMPILE_FLAG([-Werror=unused-command-line-argument],
+                      [CFLAGS="${CFLAGS} -Werror=unused-command-line-argument"],
+  [CFLAGS="`echo ${CFLAGS} | sed \"s|-Werror=unused-command-line-argument||g\"`"])
 AX_CHECK_COMPILE_FLAG([-fno-common],[CFLAGS="${CFLAGS} -fno-common"],
                      [CFLAGS="`echo ${CFLAGS} | sed \"s|-fno-common||g\"`"])
 AX_CHECK_COMPILE_FLAG([-fno-exceptions],[CFLAGS="${CFLAGS} -fno-exceptions"],
@@ -275,11 +281,17 @@ CFLAGS="${CFLAGS} ${MY_ARCH_FLAG}" # kernel extensions need to be same arch as k
 
 LT_LANG([C])
 LT_LANG([C++])
+m4_ifndef([WINE_PATH_LDD],[
+  AC_DEFUN([WINE_PATH_LDD],[
+    AC_PATH_PROG([LDD],[ldd],[true],[/sbin:/usr/sbin:${PATH}])
+  ])
+])
 WINE_PATH_LDD dnl# from m4/wine.m4 (from wine)
 
 AX_CHECK_LINK_FLAG([-static],[LDFLAGS="${LDFLAGS} -static"],[
   LDFLAGS="`echo ${LDFLAGS} | sed \"s|-static||g\"`"
-  AX_CHECK_LINK_FLAG([-Wl,-static],[LDFLAGS="${LDFLAGS} -Wl,-static"],[])
+  AX_CHECK_LINK_FLAG([-Wl,-static],[LDFLAGS="${LDFLAGS} -Wl,-static"],
+                     [LDFLAGS="`echo ${LDFLAGS} | sed \"s|-Wl,-static||g\"`"])
 ]) dnl# from ax_check_link_flag.m4 (from the autoconf-archive)
 
 XORG_LD_WRAP dnl# from m4/xorg-macros.m4 (from the xorg-util-macros package)
