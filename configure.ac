@@ -59,7 +59,7 @@ SPL_AC_META
 SPL_AC_CONFIG
 
 # Automake
-AM_INIT_AUTOMAKE([1.11 foreign tar-ustar -Wall])
+AM_INIT_AUTOMAKE([1.11.6 foreign tar-ustar -Wall])
 AM_MAINTAINER_MODE
 AM_MISSING_PROG([KEXTUTIL],[kextutil])
 AM_PROG_INSTALL_STRIP
@@ -68,14 +68,14 @@ dnl# Putting AC_PROG_AWK (and other macros like this) inside a conditional
 dnl# like this is a hack to emulate the use of AC_REQUIRE([]) outside of
 dnl# an AC_DEFUN([])
 if test "x${AWK}" = "x"; then
-	test -z "${AWK}"
+	test -z "${AWK}" || unset AWK
 	AC_PROG_AWK
 else
 	# Autoconf likes to remove AC_SUBSTs from conditions
 	# so this test and the others like it are dummies
 	# to make sure that the "else" condition does not
 	# become empty
-	test ! -z "${AWK}" && export AWK
+	test -n "${AWK}" && export AWK
 	AC_SUBST([AWK])
 fi
 AC_CONFIG_HEADERS([spl_config.h],[
@@ -97,21 +97,21 @@ dnl# save ${CFLAGS} since AC_PROG_CC likes to insert "-g -O2"
 dnl# if ${CFLAGS} is blank
 cflags_save="${CFLAGS}"
 if test "x${CC}" = "x"; then
-	test -z "${CC}"
+	test -z "${CC}" || unset CC
 	AC_PROG_CC
 else
-	test ! -z "${CC}" && export CC
+	test -n "${CC}" && export CC
 	AC_SUBST([CC])
 fi
 if test "x${CC_C_O}" = "x"; then
-	test -z "$CC_C_O"
+	test -z "${CC_C_O}" || unset CC_C_O
 	AM_PROG_CC_C_O
 else
-	test ! -z "${CC_C_O}" && export CC_C_O
+	test -n "${CC_C_O}" && export CC_C_O
 	AC_SUBST([CC_C_O])
 fi
 if test "x${CPP}" = "x"; then
-	test -z "${CPP}"
+	test -z "${CPP}" || unset CPP
 	AC_PROG_CPP
 else
 	XORG_PROG_RAWCPP([]) dnl# from m4/xorg-macros.m4 (from the xorg-util-macros package)
@@ -125,6 +125,18 @@ CFLAGS="${cflags_save}"
 export CFLAGS
 
 AM_PROG_AR
+m4_ifdef([AC_PROG_AR],[
+if test "x${AR}" = "x"; then
+  test -z "${AR}" || unset AR
+  ## might want to switch around these checks...
+  if test "x${ac_cv_prog_AR}" = "x"; then
+    test -z "${ac_cv_prog_AR}" || unset ac_cv_prog_AR
+    AC_PROG_AR
+  else
+    test -x "`which ar`" && echo "first executable ar found is `which ar`"
+  fi
+fi
+])dnl
 AM_PROG_AS
 
 LT_PREREQ([2.2.4])
@@ -134,10 +146,10 @@ dnl# libtool should have already found ranlib, but autoscan will still
 dnl# complain about it, and I am more okay with libtoolize warnings than
 dnl# I am with autoscan warnings
 if test "x${RANLIB}" = "x"; then
-	test -z "${RANLIB}"
+	test -z "${RANLIB}" || unset RANLIB
 	AC_PROG_RANLIB
 else
-	test ! -z "${RANLIB}" && export RANLIB
+	test -n "${RANLIB}" && export RANLIB
 	AC_SUBST([RANLIB])
 fi
 
@@ -164,6 +176,8 @@ AC_CHECK_LIB([kmod],[main])
 AC_CHECK_LIB([kmodc++],[main])
 # Note: Do NOT add checks for any other libraries
 # (such as libc), because doing so can cause errors
+# ...well ok, maybe one more:
+AC_CHECK_LIB([crt0.o],[main])dnl# FIXME: figure out which flag is asking for this
 
 # Checks for header files.
 AC_CHECK_HEADERS([cdefs.h errno.h fcntl.h kern/debug.h kern/locks.h \
@@ -188,11 +202,12 @@ dnl# Only force universal build if ld_classic is NOT present,
 dnl# because it will be used if available, which can cause failures
 if test -z "`which ld_classic`"; then
 	AC_SUBST([ac_cv_c_bigendian])
-	AC_DEFINE([AC_APPLE_UNIVERSAL_BUILD],[1],[Define if building universal (internal helper macro)])
+	AC_DEFINE([AC_APPLE_UNIVERSAL_BUILD],[1],
+	          [Define if building universal (internal helper macro)])
 elif test -n "`which ld_classic`" && test -x "`which ld_classic`"; then
 	unset ac_cv_c_bigendian
 	AC_PATH_PROG([LD_CLASSIC],[ld_classic])
-	if test ! -z "`echo ${LDFLAGS} | grep \"dead_strip_dylibs\"`"; then
+	if test -n "`echo ${LDFLAGS} | grep \"dead_strip_dylibs\"`"; then
 		LDFLAGS="`echo ${LDFLAGS} | sed \"s|-Wl,-dead_strip_dylibs||g\"`"
 		export LDFLAGS
 	fi
@@ -232,7 +247,6 @@ AC_CHECK_SIZEOF([void *])
 AC_CHECK_ALIGNOF([void *])dnl
 
 # More checks for compiler characteristics (specifically flags recongnized)
-AC_PROG_GCC_TRADITIONAL
 AX_GCC_ARCHFLAG dnl# from m4/ax_gcc_archflag.m4 (from the autoconf-archive)
 dnl# These are all from m4/ax_check_compile_flag.m4 (from the autoconf-archive)
 AX_CHECK_COMPILE_FLAG([-Werror=unused-command-line-argument],
@@ -274,10 +288,10 @@ AX_CHECK_COMPILE_FLAG([-fcheck-new],[CXXFLAGS="${CXXFLAGS} -fcheck-new"],
                       [CXXFLAGS="`echo ${CXXFLAGS} | sed \"s|-fcheck-new||g\"`"])
 AC_LANG_POP
 
-MY_ARCH_FLAG="-arch `uname -m`"
-CFLAGS="${CFLAGS} ${MY_ARCH_FLAG}" # kernel extensions need to be same arch as kernel
-# Not doing a check to see if the compiler supports this flag because
-# AX_CHECK_COMPILE_FLAG chokes on flags with spaces in them
+MY_ARCH_FLAG="-Wc,-arch,`uname -m`"
+# kernel extensions need to be same arch as kernel
+AX_CHECK_COMPILE_FLAG(["${MY_ARCH_FLAG}"],[CFLAGS="${CFLAGS} ${MY_ARCH_FLAG}"],
+                      [echo "CFLAGS are ${CFLAGS}"])
 
 LT_LANG([C])
 LT_LANG([C++])
@@ -299,6 +313,7 @@ XORG_LD_WRAP dnl# from m4/xorg-macros.m4 (from the xorg-util-macros package)
 # Checks for library functions.
 AC_HEADER_MAJOR
 AC_FUNC_CHOWN
+AC_FUNC_STRNLEN
 AC_CHECK_FUNCS([atexit bzero current_proc current_thread gethrtime kevent \
                 kmemchr kqueue memset printf sigmask strchr strdup strpbrk \
                 strrchr strtol strtoul system uio_offset])dnl
@@ -308,12 +323,12 @@ AH_TEMPLATE([HAVE_DOS_FILESYS_LIMITATIONS],
             [Define to 1 if your filesystem is DOS-like.])
 AC_MSG_CHECKING([how we should use target.h])
 if test -e ./target.h; then
-	if test ! -z "${DEFS}"; then
+	if test -n "${DEFS}"; then
 		DEFS="${DEFS} -DHAVE_TARGET_H"
 	elif test -z "${DEFS}"; then
 		DEFS="-DHAVE_TARGET_H"
 	else
-		AC_MSG_ERROR([DEFS should be either empty or non-empty, not neither])
+	  AC_MSG_ERROR([DEFS should be either empty or non-empty, not neither])
 	fi
 	export DEFS
 	AC_SUBST([DEFS])
@@ -325,7 +340,7 @@ fi
 
 AH_BOTTOM([
 #ifdef HAVE_TARGET_H
-#include "target.h"
+# include "target.h"
 #endif /* HAVE_TARGET_H */
 ])dnl
 
@@ -343,10 +358,12 @@ AC_CONFIG_FILES([Makefile \
 AC_OUTPUT
 
 if test -e ./target.h; then
-	if test ! -z "${DEFS}"; then
+	if test -n "${DEFS}"; then
 		DEFS="${DEFS} -DHAVE_TARGET_H"
 	elif test -z "${DEFS}"; then
 		DEFS="-DHAVE_TARGET_H"
+	else
+	  AC_MSG_ERROR([DEFS should be either empty or non-empty, not neither])
 	fi
 fi
 

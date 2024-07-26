@@ -29,6 +29,8 @@
  *
  */
 
+#include <stddef.h>
+#include <string.h>
 #include <sys/atomic.h>
 #include <sys/kernel.h>
 #include <libkern/OSAtomic.h>
